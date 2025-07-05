@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>팀 분석 결과</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center px-4">
+  <div class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-2xl">
+    <h1 class="text-2xl font-bold mb-4">팀 코드: {{ team_code }} - 팀 분석 결과</h1>
+
+    <!-- 👥 팀원 목록 헤더 제거하고 이 줄로 교체 -->
+    <p class="text-xl font-semibold mt-4 mb-2">👥 총 참여 인원: <span class="font-bold">{{ total }}명</span></p>
+
+    <ul class="mb-6 list-disc list-inside">
+    {% for name, t in members %}
+        <li>{{ name }} - {{ t }}</li>
+    {% endfor %}
+    </ul>
+
+
+
+    <h2 class="text-xl font-semibold mb-2">📊 팀 유형 분포</h2>
+    <canvas id="barChart" class="bg-white rounded-xl p-2"></canvas>
+
+    <h2 class="text-xl font-semibold mt-6 mb-2">🔍 팀 분석 요약</h2>
+    <p class="text-gray-300">{{ summary }}</p>
+  </div>
+
+  <script>
+    const ctx = document.getElementById('barChart').getContext('2d');
+    const barChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: {{ type_counts.keys()|list|tojson }},
+        datasets: [{
+          label: '인원 수',
+          data: {{ type_counts.values()|list|tojson }},
+          backgroundColor: 'rgba(59, 130, 246, 0.8)'
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            stepSize: 1,
+            precision: 0,
+            ticks: {
+              callback: function(value) {
+                return Number.isInteger(value) ? value : '';
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

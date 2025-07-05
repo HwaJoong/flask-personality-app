@@ -29,7 +29,8 @@ questions = [
 
 @app.route('/')
 def home():
-    return redirect(url_for('name'))
+    return render_template('name.html')  # ← redirect 말고 직접 렌더링
+
 
 @app.route('/name', methods=['GET', 'POST'])
 def name():

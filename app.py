@@ -6,7 +6,7 @@ import json
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
-# 테스트용 질문 2개만 사용
+# 질문 목록
 questions = [
     "나는 새로운 아이디어를 생각해내는 것을 좋아한다.",
     "복잡한 문제를 해결할 때 창의적인 접근을 시도하는 편이다.",
@@ -26,11 +26,9 @@ questions = [
     "익숙한 환경에서 안정적으로 일하는 걸 선호한다."
 ]
 
-
 @app.route('/')
 def home():
-    return render_template('name.html')  # ← redirect 말고 직접 렌더링
-
+    return render_template('name.html')
 
 @app.route('/name', methods=['GET', 'POST'])
 def name():
@@ -47,31 +45,25 @@ def team():
 @app.route('/generate_team_code')
 def generate_team_code():
     import string, random
-
-    # 기존 팀 코드 목록 수집
     existing_codes = set()
     if os.path.exists("data"):
         for filename in os.listdir("data"):
             if filename.endswith(".json"):
                 existing_codes.add(filename.replace(".json", "").upper())
 
-    # 중복되지 않는 7자리 코드 생성
     while True:
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
         if code not in existing_codes:
             break
 
     return jsonify({'code': code})
 
-
-
 @app.route('/set_team_code', methods=['POST'])
 def set_team_code():
     team_code = request.form.get('team_code')
     session['team_code'] = team_code.strip() if team_code and team_code.strip() else None
-    session.pop('answers', None)  # 이전 응답 초기화
+    session.pop('answers', None)
     return redirect(url_for('question'))
-
 
 @app.route('/question', methods=['GET', 'POST'])
 def question():
@@ -135,6 +127,14 @@ def result():
         team_code=team_code,
         username=username
     )
+
+@app.route('/check_team_code/<team_code>', methods=['HEAD'])
+def check_team_code(team_code):
+    file_path = f"data/{team_code}.json"
+    if os.path.exists(file_path):
+        return '', 200  # OK
+    else:
+        return '', 404  # Not Found
 
 @app.route('/team_result/<team_code>')
 def team_result(team_code):

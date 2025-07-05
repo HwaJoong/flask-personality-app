@@ -2,58 +2,109 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>팀 코드 입력</title>
+  <title>팀 코드 설정</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen px-4">
-  <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
-    <h1 class="text-2xl font-bold mb-6 text-center">팀 코드 설정</h1>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center px-4">
+  <div class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md text-center">
+    <h1 class="text-2xl font-bold mb-6">팀 코드 설정</h1>
 
-    <!-- 팀 코드 입력 폼 (이제 필수 아님) -->
-    <form method="post" action="{{ url_for('set_team_code') }}" class="flex gap-2 mb-4">
-        <input type="text" name="team_code" placeholder="(선택) 팀 코드 입력 - 개인은 생략 가능"
-        class="border p-3 rounded w-full text-black">
- 
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-base w-24">
-            다음
-        </button>
-          
-    </form>
+    <form method="POST" action="/set_team_code">
+      <input
+        type="text"
+        name="team_code"
+        id="team_code"
+        placeholder="(선택) 팀 코드 입력 - 개인은 생략 가능"
+        class="w-full px-4 py-2 mb-4 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
 
-    <!-- 팀 코드 자동 생성 버튼 -->
-    <div class="text-center mb-4">
-        <button onclick="generateCode()" class="bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-600 text-sm">
+      <div class="flex justify-center gap-4 mb-2">
+        <button
+          type="button"
+          id="generate"
+          class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded flex items-center"
+        >
           🔄 코드 생성
         </button>
-    </div>
 
-    <!-- ✅ 팀 결과 미리 보기 버튼 -->
-    <form method="get" action="" id="previewForm" class="text-center">
-      <button type="submit"
-              class="text-blue-400 underline hover:text-blue-200 text-sm"
-              onclick="event.preventDefault(); goToResult();">
-        🔍 현재 팀 결과 미리 보기
+        <button
+          type="button"
+          id="copy"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+        >
+          📋 복사
+        </button>
+      </div>
+
+      <p id="statusMessage" class="text-sm mb-4 hidden"></p>
+
+      <button
+        type="submit"
+        class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-4"
+      >
+        다음
       </button>
     </form>
+
+    <!-- 결과 보기 링크 -->
+    <p class="mt-6">
+      🔍 <a id="previewLink" class="text-blue-400 hover:underline cursor-pointer">현재 팀 결과 미리 보기</a>
+    </p>
   </div>
 
   <script>
-    function generateCode() {
-      fetch("/generate_team_code")
-        .then(response => response.json())
-        .then(data => {
-          document.querySelector('input[name="team_code"]').value = data.code;
-        });
+    const input = document.getElementById('team_code');
+    const generateBtn = document.getElementById('generate');
+    const copyBtn = document.getElementById('copy');
+    const previewLink = document.getElementById('previewLink');
+    const statusMsg = document.getElementById('statusMessage');
+
+    function showMessage(text, color = 'green') {
+      statusMsg.textContent = (color === 'green' ? '✅ ' : '⚠️ ') + text;
+      statusMsg.className = `text-${color}-400 text-sm mb-4`;
+      statusMsg.classList.remove('hidden');
+      setTimeout(() => {
+        statusMsg.classList.add('hidden');
+      }, 2500);
     }
 
-    function goToResult() {
-      const code = document.querySelector('input[name="team_code"]').value.trim();
-      if (code) {
-        window.location.href = `/team_result/${code}`;
-      } else {
-        alert("먼저 팀 코드를 입력하세요.");
+    generateBtn.addEventListener('click', async () => {
+      const res = await fetch('/generate_team_code');
+      const data = await res.json();
+      input.value = data.code;
+    });
+
+    copyBtn.addEventListener('click', () => {
+      const code = input.value.trim();
+      if (!code) {
+        showMessage('팀 코드를 먼저 입력해주세요.', 'yellow');
+        return;
       }
-    }
+      navigator.clipboard.writeText(code).then(() => {
+        showMessage('복사되었습니다!', 'green');
+      });
+    });
+
+
+    previewLink.addEventListener('click', async () => {
+        const code = input.value.trim();
+        if (!code) {
+        showMessage('팀 코드를 먼저 입력해주세요.', 'yellow');
+        return;
+        }
+    
+        try {
+        const res = await fetch(`/check_team_code/${code}`, { method: 'HEAD' });
+        if (res.ok) {
+            window.location.href = `/team_result/${code}`;
+        } else {
+            showMessage(`팀 코드 '${code}'에 대한 데이터가 없습니다.`, 'yellow');
+        }
+        } catch (err) {
+        showMessage('서버에 연결할 수 없습니다.', 'yellow');
+        }
+    });
+  
   </script>
 </body>
 </html>

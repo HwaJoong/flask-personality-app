@@ -26,9 +26,15 @@ questions = [
     "익숙한 환경에서 안정적으로 일하는 걸 선호한다."
 ]
 
-@app.route('/')
+
+@app.route('/', methods=['GET', 'POST'])
 def home():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        session['username'] = username
+        return redirect(url_for('team'))
     return render_template('name.html')
+
 
 @app.route('/name', methods=['GET', 'POST'])
 def name():

@@ -8,26 +8,24 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
-
-    <!-- ✅ 저장 대상 영역 -->
-    <div id="result-section" class="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full">
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center px-4">
+    <div id="resultCard" class="bg-gray-800 rounded-2xl shadow-xl p-8 max-w-2xl w-full">
         <!-- 결과 요약 -->
         <div class="text-left">
-            <h1 class="text-2xl font-bold text-gray-800 mb-3">
+            <h1 class="text-2xl font-bold text-white mb-3">
                 📌 {{ username }}님의 리더십/협업 유형은:
             </h1>
-            <h2 class="text-xl font-bold text-blue-600 mb-4">
+            <h2 class="text-xl font-bold text-blue-400 mb-4">
                 {{ description.title }}
             </h2>
 
-            <p class="text-gray-700 mb-6 text-base leading-relaxed">
+            <p class="text-gray-300 mb-6 text-base leading-relaxed">
                 {{ description.summary }}
             </p>
 
             <div class="mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">🔍 추천 업무 스타일</h3>
-                <ul class="list-disc pl-5 text-gray-700 space-y-1">
+                <h3 class="text-lg font-semibold text-white mb-2">🔍 추천 업무 스타일</h3>
+                <ul class="list-disc pl-5 text-gray-300 space-y-1">
                     {% for item in description.style %}
                         <li>{{ item }}</li>
                     {% endfor %}
@@ -35,8 +33,8 @@
             </div>
 
             <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">💡 팀에서 잘 맞는 파트너</h3>
-                <ul class="list-disc pl-5 text-gray-700 space-y-1">
+                <h3 class="text-lg font-semibold text-white mb-2">💡 팀에서 잘 맞는 파트너</h3>
+                <ul class="list-disc pl-5 text-gray-300 space-y-1">
                     {% for line in description.partner.split('\n') %}
                         <li>{{ line }}</li>
                     {% endfor %}
@@ -45,29 +43,28 @@
         </div>
 
         <!-- 그래프 -->
-        <div class="mt-8 pt-4 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">📊 유형별 점수</h3>
+        <div class="mt-8 pt-4 border-t border-gray-700">
+            <h3 class="text-lg font-semibold text-white mb-2">📊 유형별 점수</h3>
             <canvas id="barChart" class="w-full"></canvas>
         </div>
 
-        <!-- ✅ 버튼 두 개를 아래에 정렬 -->
-        <div class="mt-8 pt-6 border-t border-gray-200">
-            {% if team_code is defined and team_code %}
-                <p class="mb-3 text-gray-600 text-center">🧑‍🤝‍🧑 팀 코드: <strong>{{ team_code }}</strong></p>
-                <div class="flex justify-center gap-4">
-                    <button id="save-btn"
-                            onclick="saveResultImage()"
-                            class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
-                        📥 저장하기
-                    </button>
-                    <a href="{{ url_for('team_result', team_code=team_code) }}"
-                    class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-                    👉 팀 결과 보기
-                    </a>
-                </div>
-            {% endif %}
+        <!-- 팀 코드 및 버튼 -->
+        {% if team_code is defined and team_code %}
+        <hr class="my-6 border-gray-600">
+        <div class="mt-6 text-center">
+            <p class="mb-2 text-gray-400">🧑‍🤝‍🧑 팀 코드: <strong>{{ team_code }}</strong></p>
+            <div class="flex justify-center gap-4">
+                <button onclick="saveImage()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                    📥 저장하기
+                </button>
+                <a href="{{ url_for('team_result', team_code=team_code) }}"
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                   👉 팀 결과 보기
+                </a>
+            </div>
         </div>
-
+        {% endif %}
+    </div>
 
     <script>
         const scores = {{ result_scores | tojson }};
@@ -75,7 +72,7 @@
         const values = Object.values(scores);
 
         const chartColors = [
-            '#2563eb', '#10b981', '#f97316',
+            '#3b82f6', '#10b981', '#f97316',
             '#f43f5e', '#8b5cf6', '#14b8a6'
         ];
 
@@ -108,21 +105,18 @@
             }
         });
 
-        function saveResultImage() {
-            const element = document.getElementById('result-section');
-            const username = "{{ username | default('사용자') }}";
-            const now = new Date();
-            const pad = (n) => n.toString().padStart(2, '0');
-            const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-            const filename = `${username}_분석결과_${timestamp}.png`;
-
+        function saveImage() {
+            const element = document.getElementById('resultCard');
             html2canvas(element).then(canvas => {
                 const link = document.createElement('a');
+                const timestamp = new Date().toISOString().slice(0,19).replace(/[:T]/g, "");
+                const filename = '{{ username }}_분석결과_' + timestamp + '.png';
                 link.download = filename;
-                link.href = canvas.toDataURL('image/png');
+                link.href = canvas.toDataURL("image/png");
                 link.click();
             });
         }
     </script>
 </body>
 </html>
+ 

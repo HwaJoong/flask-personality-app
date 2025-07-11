@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ 추가됨 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>팀 코드 설정</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -61,8 +61,10 @@
     const statusMsg = document.getElementById('statusMessage');
 
     function showMessage(text, color = 'green') {
+      const bg = color === 'green' ? 'bg-green-800' : 'bg-yellow-800';
+      const fg = color === 'green' ? 'text-green-100' : 'text-yellow-100';
       statusMsg.textContent = (color === 'green' ? '✅ ' : '⚠️ ') + text;
-      statusMsg.className = `text-${color}-400 text-sm mb-4`;
+      statusMsg.className = `${bg} ${fg} text-sm mb-4 px-3 py-2 rounded`;
       statusMsg.classList.remove('hidden');
       setTimeout(() => {
         statusMsg.classList.add('hidden');
@@ -86,26 +88,24 @@
       });
     });
 
-
     previewLink.addEventListener('click', async () => {
-        const code = input.value.trim();
-        if (!code) {
+      const code = input.value.trim();
+      if (!code) {
         showMessage('팀 코드를 먼저 입력해주세요.', 'yellow');
         return;
-        }
-    
-        try {
+      }
+
+      try {
         const res = await fetch(`/check_team_code/${code}`, { method: 'HEAD' });
         if (res.ok) {
-            window.location.href = `/team_result/${code}`;
+          window.location.href = `/team_result/${code}`;
         } else {
-            showMessage(`팀 코드 '${code}'에 대한 데이터가 없습니다.`, 'yellow');
+          showMessage(`팀 코드 '${code}'에 대한 데이터가 없습니다.`, 'yellow');
         }
-        } catch (err) {
+      } catch (err) {
         showMessage('서버에 연결할 수 없습니다.', 'yellow');
-        }
+      }
     });
-  
   </script>
 </body>
 </html>

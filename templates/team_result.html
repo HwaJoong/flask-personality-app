@@ -12,13 +12,12 @@
   <div id="team-result-section" class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-2xl">
 
     {% if error %}
-      <p class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded mb-6 font-semibold">
+      <p class="bg-yellow-800 text-yellow-100 px-4 py-2 rounded mb-6 font-semibold">
         {{ error }}
       </p>
     {% endif %}
 
     {% if total > 0 %}
-      <!-- 정상 결과 영역 -->
       <h1 class="text-2xl font-bold mb-4">팀 코드: {{ team_code }} - 팀 분석 결과</h1>
 
       <p class="text-xl font-semibold mt-4 mb-2">👥 총 참여 인원: <span class="font-bold">{{ total }}명</span></p>
@@ -29,12 +28,11 @@
       </ul>
 
       <h2 class="text-xl font-semibold mb-2">📊 팀 유형 분포</h2>
-      <canvas id="barChart" class="bg-white rounded-xl p-2"></canvas>
+      <canvas id="barChart" class="bg-gray-100 rounded-xl p-2"></canvas>
 
       <h2 class="text-xl font-semibold mt-6 mb-2">🔍 팀 분석 요약</h2>
       <p class="text-gray-300">{{ summary }}</p>
 
-      <!-- ✅ 하단 버튼 영역 -->
       <div class="mt-10 pt-6 border-t border-gray-600">
         <div class="flex justify-center gap-4">
           <button onclick="saveTeamImage()"

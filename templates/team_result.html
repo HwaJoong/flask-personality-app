@@ -28,7 +28,7 @@
       </ul>
 
       <h2 class="text-xl font-semibold mb-2">📊 팀 유형 분포</h2>
-      <canvas id="barChart" class="bg-gray-100 rounded-xl p-2"></canvas>
+      <canvas id="barChart" class="rounded-xl p-2 w-full h-64"></canvas>
 
       <h2 class="text-xl font-semibold mt-6 mb-2">🔍 팀 분석 요약</h2>
       <p class="text-gray-300">{{ summary }}</p>
@@ -51,6 +51,7 @@
   {% if total > 0 %}
   <script>
     const ctx = document.getElementById('barChart').getContext('2d');
+
     const barChart = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -63,12 +64,18 @@
         }]
       },
       options: {
+        responsive: true,
         scales: {
           y: {
             beginAtZero: true,
             ticks: {
               precision: 0,
-              callback: value => Number.isInteger(value) ? value : ''
+              color: 'white'
+            }
+          },
+          x: {
+            ticks: {
+              color: 'white'
             }
           }
         },
@@ -79,7 +86,18 @@
             }
           }
         }
-      }
+      },
+      plugins: [{
+        id: 'custom_canvas_background_color',
+        beforeDraw: (chart) => {
+          const ctx = chart.canvas.getContext('2d');
+          ctx.save();
+          ctx.globalCompositeOperation = 'destination-over';
+          ctx.fillStyle = '#1f2937'; // Tailwind bg-gray-800
+          ctx.fillRect(0, 0, chart.width, chart.height);
+          ctx.restore();
+        }
+      }]
     });
 
     function saveTeamImage() {
@@ -109,4 +127,3 @@
   {% endif %}
 </body>
 </html>
- 

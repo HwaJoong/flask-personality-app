@@ -2,28 +2,31 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 추가 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>성향 분석 시작하기</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <meta name="google-adsense-account" content="ca-pub-7233090570998813">
 </head>  
-<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen px-3 sm:px-4 md:px-6">
 
-  <div class="bg-gray-800 p-8 rounded-xl shadow-lg text-center w-full max-w-md">
-    
+  <div class="bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg text-center w-full max-w-xl">
+
     <!-- 🔽 설명 추가 -->
-    <h2 class="text-2xl font-bold mb-4">👤 팀에서의 당신의 성향을 알아보세요!</h2>
-    <p class="text-sm text-gray-300 mb-6">
+    <h2 class="text-3xl sm:text-4xl font-bold mb-4 break-keep">
+      👤 팀에서의 당신의 성향을 알아보세요!
+    </h2>
+
+    <p class="text-base sm:text-lg md:text-xl text-gray-300 mb-6 leading-relaxed">
       총 16개의 질문을 통해 <span class="text-blue-400 font-medium">리더십/협업 스타일</span>을 분석해드립니다.<br>
       아래에 이름을 입력하고 지금 바로 시작해보세요.
     </p>
 
     <form method="POST">
-      <label for="username" class="block mb-2 text-left">이름을 입력해주세요</label>
+      <label for="username" class="block mb-2 text-left text-base sm:text-lg">이름을 입력해주세요</label>
       <input type="text" id="username" name="username" required
-             class="w-full px-4 py-2 mb-4 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+             class="w-full px-4 py-2 mb-4 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-lg">
       <button type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-base sm:text-lg">
         다음
       </button>
     </form>

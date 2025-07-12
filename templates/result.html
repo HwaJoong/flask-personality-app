@@ -85,18 +85,26 @@
         </div>
 
         <!-- 저장 및 공유 버튼 -->
+        <!-- 저장 및 공유 + 팀 결과 버튼 -->
         <div class="mt-10 pt-6 border-t border-gray-600">
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button onclick="saveImage()"
-                        class="text-sm sm:text-base px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
-                    📥 저장하기
-                </button>
-                <button onclick="copyShareUrl()"
-                        class="text-sm sm:text-base px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition">
-                    🔗 공유하기
-                </button>
+            <button onclick="saveImage()"
+                    class="text-sm sm:text-base px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
+                📥 저장하기
+            </button>
+            <button onclick="copyShareUrl()"
+                    class="text-sm sm:text-base px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition">
+                🔗 공유하기
+            </button>
+            {% if team_code %}
+            <a href="/team_result/{{ team_code }}"
+                class="text-sm sm:text-base px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700 transition text-center">
+                👥 팀 결과 보기
+            </a>
+            {% endif %}
             </div>
         </div>
+  
     </div>
 
     <script>

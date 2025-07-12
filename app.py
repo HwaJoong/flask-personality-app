@@ -115,8 +115,34 @@ def result():
 
     username = session.get('username', '사용자')
     labels = list(result_scores.keys())
-
     team_code = session.get("team_code")
+
+    # ✅ 결과 저장
+    if team_code:
+        file_path = f"data/{team_code}.json"
+        os.makedirs("data", exist_ok=True)
+
+        # 기존 데이터 로드
+        if os.path.exists(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                try:
+                    raw_data = json.load(f)
+                except json.JSONDecodeError:
+                    raw_data = []
+        else:
+            raw_data = []
+
+        # 동일 이름 제거 후 새 결과 추가
+        raw_data = [entry for entry in raw_data if entry["name"] != username]
+        raw_data.append({
+            "name": username,
+            "scores": result_scores,
+            "type": user_type
+        })
+
+        # 다시 저장
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(raw_data, f, ensure_ascii=False, indent=2)
 
     return render_template("result.html",
                            username=username,
@@ -124,6 +150,7 @@ def result():
                            result_scores=result_scores,
                            labels=labels,
                            team_code=team_code)
+
 
 
 @app.route('/check_team_code/<team_code>', methods=['HEAD'])

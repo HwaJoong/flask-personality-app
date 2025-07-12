@@ -157,13 +157,14 @@
     }
 
     function copyShareUrl() {
-      const url = 'https://personalyze.onrender.com';
-      navigator.clipboard.writeText(url).then(() => {
-        alert('공유 링크가 복사되었습니다!');
-      }).catch(err => {
-        alert('복사 실패: ' + err);
-      });
-    }
+  const currentUrl = window.location.href;
+  navigator.clipboard.writeText(currentUrl).then(() => {
+    alert('팀 결과 링크가 복사되었습니다:\n' + currentUrl);
+  }).catch(err => {
+    alert('링크 복사 실패: ' + err);
+  });
+}
+
   </script>
   {% endif %}
 </body>

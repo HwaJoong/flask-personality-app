@@ -22,8 +22,8 @@
 
       <p class="text-xl font-semibold mt-4 mb-2">👥 총 참여 인원: <span class="font-bold">{{ total }}명</span></p>
       <ul class="mb-6 list-disc list-inside">
-        {% for name, t in members %}
-          <li>{{ name }} - {{ t }}</li>
+        {% for name in sorted_names %}
+          <li>{{ name }}</li>
         {% endfor %}
       </ul>
 
@@ -32,6 +32,44 @@
 
       <h2 class="text-xl font-semibold mt-6 mb-2">🔍 팀 분석 요약</h2>
       <p class="text-gray-300">{{ summary }}</p>
+
+      <h2 class="text-xl font-semibold mt-6 mb-2">🧬 팀 구성 특성 분석</h2>
+      <p class="text-gray-300">{{ trait_text }}</p>
+
+      <h2 class="text-xl font-semibold mt-6 mb-2">🧠 상세 해석</h2>
+      <p class="text-gray-300">{{ detailed_text }}</p>
+
+      <h2 class="text-xl font-semibold mt-6 mb-2">🗣 소통 및 갈등 구조</h2>
+      <p class="text-gray-300">{{ communication_text }}</p>
+
+      {% if recommendation_text %}
+        <h2 class="text-xl font-semibold mt-6 mb-2">🧭 추천 행동 전략</h2>
+        <ul class="list-disc list-inside text-gray-300">
+          {% for line in recommendation_text.splitlines() %}
+            <li>{{ line }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <h2 class="text-xl font-semibold mt-6 mb-2">🧑‍🤝‍🧑 개인 성향 요약</h2>
+      <table class="w-full text-sm text-left text-gray-300 border border-gray-600 mt-2">
+        <thead class="text-xs uppercase bg-gray-700 text-white">
+          <tr>
+            <th class="px-4 py-2">이름</th>
+            <th class="px-4 py-2">유형</th>
+            <th class="px-4 py-2">요약</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, t, desc in member_summaries %}
+          <tr class="border-t border-gray-600">
+            <td class="px-4 py-2">{{ name }}</td>
+            <td class="px-4 py-2">{{ t }}</td>
+            <td class="px-4 py-2">{{ desc }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
       <div class="mt-10 pt-6 border-t border-gray-600">
         <div class="flex justify-center gap-4">

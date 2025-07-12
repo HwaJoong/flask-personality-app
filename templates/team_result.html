@@ -19,7 +19,9 @@
     {% endif %}
 
     {% if total > 0 %}
-      <h1 class="text-2xl sm:text-3xl font-bold mb-4">팀 코드: {{ team_code }} - 팀 분석 결과</h1>
+    <h1 class="text-2xl sm:text-3xl font-bold mb-4">
+      <span class="whitespace-nowrap">팀 코드: {{ team_code }} - 팀 분석 결과</span>
+    </h1>
 
       <p class="text-lg sm:text-xl font-semibold mt-4 mb-2">👥 총 참여 인원: <span class="font-bold">{{ total }}명</span></p>
       <ul class="mb-6 list-disc list-inside text-base sm:text-lg text-gray-300">

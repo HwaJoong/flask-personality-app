@@ -90,49 +90,41 @@ def question():
             session['answers'] = []
         return render_template('question.html', q=0, question=questions[0], questions=questions)
 
-@app.route('/result')
+from flask import render_template
+
+@app.route("/result")
 def result():
-    answers = session.get("answers", [])
-    if not answers or len(answers) != len(questions):
+    answers = session.get('answers')
+    if not answers:
         return redirect(url_for('question'))
 
-    result_scores = calculate_scores(answers)
-    user_type = determine_type(result_scores)
+    # 점수 계산
+    result_scores = calculate_scores(answers)  # {"창의형": 10, ...}
+    user_type = determine_type(result_scores)  # 가장 높은 유형
+
+    # 설명 구성
     description = get_description(user_type)
 
-    team_code = session.get('team_code')
-    username = session.get('username')
+    # 상세 설명 추가 (detail 키를 넣어줘야 result.html이 정상 작동)
+    description["detail"] = {
+        "strengths": type_strengths.get(user_type, "강점 정보 없음"),
+        "challenges": type_weaknesses.get(user_type, "도전 과제 정보 없음"),
+        "working_style": get_working_style(user_type),
+        "stress_response": get_stress_response(user_type)
+    }
 
-    if team_code and username:
-        os.makedirs("data", exist_ok=True)
-        file_path = f"data/{team_code}.json"
+    username = session.get('username', '사용자')
+    labels = list(result_scores.keys())
 
-        entry = {
-            "name": username,
-            "type": user_type,
-            "scores": result_scores
-        }
+    team_code = session.get("team_code")
 
-        if os.path.exists(file_path):
-            with open(file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        else:
-            data = []
+    return render_template("result.html",
+                           username=username,
+                           description=description,
+                           result_scores=result_scores,
+                           labels=labels,
+                           team_code=team_code)
 
-        data = [d for d in data if d.get("name") != username]
-        data.append(entry)
-
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-
-    return render_template(
-        "result.html",
-        description=description,
-        result_scores=result_scores,
-        labels=list(result_scores.keys()),
-        team_code=team_code,
-        username=username
-    )
 
 @app.route('/check_team_code/<team_code>', methods=['HEAD'])
 def check_team_code(team_code):
@@ -244,6 +236,7 @@ def get_description(user_type):
     return descriptions[user_type]
 
 type_strengths = {
+    "리더형": "방향 설정과 추진력, 결단력 있는 리더십",
     "조율형": "갈등 조율 능력과 팀워크 중심의 실행력",
     "창의형": "새로운 아이디어 도출과 유연한 사고",
     "분석형": "체계적인 문제 해결 능력",
@@ -252,14 +245,16 @@ type_strengths = {
     "계획형": "조직적이고 체계적인 업무 처리"
 }
 
+
 type_weaknesses = {
+    "리더형": "타인의 의견을 충분히 반영하지 못하거나 지시적으로 비칠 수 있음",
     "조율형": "과도한 타협으로 인해 결단력 부족 가능성",
-    "창의형": "세부 실행력 부족 가능성",
     "분석형": "감정적 요소 간과 및 유연성 부족 가능성",
-    "실행형": "충분한 고민 없이 성급하게 결정할 가능성",
-    "감성형": "논리보다는 감정에 치우칠 위험",
-    "계획형": "예기치 못한 변화에 유연하게 대응하지 못할 수 있음"
+    "창의형": "세부 실행력 부족, 현실성 검토가 부족할 수 있음",
+    "헌신형": "자기 주장 부족과 책임 회피 경향이 생길 수 있음",
+    "실행형": "충분한 검토 없이 성급한 행동으로 이어질 수 있음"
 }
+
 
 type_recommendations = {
     "조율형": [
@@ -288,6 +283,28 @@ type_recommendations = {
     ]
 }
 
+
+def get_working_style(user_type):
+    styles = {
+        "창의형": "자유롭고 유연한 환경을 선호하며, 틀에 박힌 방식보다는 새로움을 추구",
+        "조율형": "타인의 의견을 조율하고 조화를 이루는 방식으로 업무를 추진",
+        "분석형": "논리적 근거와 분석 중심의 문제 해결을 선호",
+        "실행형": "명확한 목표와 빠른 결과 중심의 업무 방식 선호",
+        "헌신형": "팀과의 관계와 분위기를 중시하며 협력적인 환경을 선호",
+        "리더형": "목표 중심으로 계획하고, 팀을 이끄는 역할을 선호"
+    }
+    return styles.get(user_type, "정보 없음")
+
+def get_stress_response(user_type):
+    responses = {
+        "창의형": "지속적 반복 작업, 엄격한 규칙 속에서 동기 저하 및 스트레스 발생",
+        "조율형": "갈등이 장기화될 경우 스트레스 증가, 비협조적인 분위기에 취약",
+        "분석형": "불확실한 정보와 감정적인 환경에서 스트레스를 느낌",
+        "실행형": "계획에 없던 변경 상황에서 스트레스를 받을 수 있음",
+        "헌신형": "갈등 상황이나 무시당하는 환경에서 스트레스를 느낌",
+        "리더형": "권한 부재나 목표 부재 시 동기 저하 및 스트레스 발생"
+    }
+    return responses.get(user_type, "정보 없음")
 
 
 def generate_team_summary(type_counts):
